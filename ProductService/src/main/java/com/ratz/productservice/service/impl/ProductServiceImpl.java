@@ -1,6 +1,7 @@
 package com.ratz.productservice.service.impl;
 
 import com.ratz.productservice.dto.ProductRequestDTO;
+import com.ratz.productservice.dto.ProductResponseDTO;
 import com.ratz.productservice.model.Product;
 import com.ratz.productservice.repository.ProductRepository;
 import com.ratz.productservice.service.ProductService;
@@ -29,5 +30,20 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(product);
         log.info("Product created and saved!");
         return product.getProductId();
+    }
+
+    @Override
+    public ProductResponseDTO getProductById(Long id) {
+
+        log.info("Get product by id {}" , id);
+
+        Product product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
+
+        return ProductResponseDTO.builder()
+                .productName(product.getProductName())
+                .price(product.getPrice())
+                .quantity(product.getQuantity())
+                .productId(product.getProductId())
+                .build();
     }
 }
