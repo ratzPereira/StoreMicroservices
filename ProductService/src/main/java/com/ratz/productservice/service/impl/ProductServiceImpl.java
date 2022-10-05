@@ -2,6 +2,7 @@ package com.ratz.productservice.service.impl;
 
 import com.ratz.productservice.dto.ProductRequestDTO;
 import com.ratz.productservice.dto.ProductResponseDTO;
+import com.ratz.productservice.exception.ProductServiceCustomException;
 import com.ratz.productservice.model.Product;
 import com.ratz.productservice.repository.ProductRepository;
 import com.ratz.productservice.service.ProductService;
@@ -37,7 +38,8 @@ public class ProductServiceImpl implements ProductService {
 
         log.info("Get product by id {}" , id);
 
-        Product product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
+        Product product = productRepository.findById(id)
+                .orElseThrow( () -> new ProductServiceCustomException("Product not found", "PRODUCT_NOT_FOUND"));
 
         return ProductResponseDTO.builder()
                 .productName(product.getProductName())
