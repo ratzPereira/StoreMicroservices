@@ -2,7 +2,9 @@ package com.ratz.orderservice.service.impl;
 
 import com.ratz.orderservice.dto.OrderRequestDTO;
 import com.ratz.orderservice.entity.Order;
+import com.ratz.orderservice.external.client.PaymentService;
 import com.ratz.orderservice.external.client.ProductService;
+import com.ratz.orderservice.external.request.PaymentRequest;
 import com.ratz.orderservice.repository.OrderRepository;
 import com.ratz.orderservice.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,8 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final ProductService productService;
+    private final PaymentService paymentService;
+
     @Override
     public long placeOrder(OrderRequestDTO orderRequestDTO) {
 
@@ -36,6 +40,30 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderRepository.save(order);
+        log.info("Call payment service");
+
+        PaymentRequest paymentRequest = PaymentRequest.builder()
+                .id(order.getId())
+                .paymentMode(orderRequestDTO.getPaymentMode())
+                .amount(orderRequestDTO.getAmount())
+                .build();
+
+        String orderStatus = null;
+
+        try {
+            paymentService.doPayment(paymentRequest);
+            log.info("Called payment service successful");
+            orderStatus = "PLACED";
+
+        }catch (Exception e) {
+
+            log.error("Error in payment");
+            orderStatus = "FAILED";
+        }
+
+        order.setOrderStatus(orderStatus);
+        orderRepository.save(order);
+
         log.info("Saved order request {}" , order.getId());
         return order.getId();
     }
