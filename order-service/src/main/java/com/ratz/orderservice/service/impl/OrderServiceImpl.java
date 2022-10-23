@@ -1,7 +1,9 @@
 package com.ratz.orderservice.service.impl;
 
 import com.ratz.orderservice.dto.OrderRequestDTO;
+import com.ratz.orderservice.dto.OrderResponseDTO;
 import com.ratz.orderservice.entity.Order;
+import com.ratz.orderservice.exception.CustomException;
 import com.ratz.orderservice.external.client.PaymentService;
 import com.ratz.orderservice.external.client.ProductService;
 import com.ratz.orderservice.external.request.PaymentRequest;
@@ -66,5 +68,18 @@ public class OrderServiceImpl implements OrderService {
 
         log.info("Saved order request {}" , order.getId());
         return order.getId();
+    }
+
+    @Override
+    public OrderResponseDTO getOrderDetails(long orderId) {
+
+         Order order = orderRepository.findById(orderId).orElseThrow(()-> new CustomException("Order not found for the id " + orderId, "NOT_FOUND", 404));
+
+        return OrderResponseDTO.builder()
+                .amount(order.getAmount())
+                .orderDate(order.getOrderDate())
+                .orderId(order.getId())
+                .orderStatus(order.getOrderStatus())
+                .build();
     }
 }

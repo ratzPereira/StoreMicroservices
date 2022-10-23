@@ -1,15 +1,13 @@
 package com.ratz.orderservice.controller;
 
 import com.ratz.orderservice.dto.OrderRequestDTO;
+import com.ratz.orderservice.dto.OrderResponseDTO;
 import com.ratz.orderservice.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/order")
@@ -26,5 +24,13 @@ public class OrderController {
         log.info("Order id {} placed", orderId);
 
         return new ResponseEntity<>(orderId, HttpStatus.CREATED);
+    }
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderResponseDTO> getOrderDetails(@PathVariable long orderId){
+
+        log.info("Getting order id {} details", orderId);
+        OrderResponseDTO orderResponseDTO = orderService.getOrderDetails(orderId);
+
+        return new ResponseEntity<>(orderResponseDTO, HttpStatus.OK);
     }
 }
